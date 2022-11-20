@@ -49,7 +49,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
     }
 
     /**
-	 * Compresses input to output, where the same InputStream has
+     * Compresses input to output, where the same InputStream has
      * previously been pre-processed via <code>preprocessCompress</code>
      * storing state used by this call.
      * <br> pre: <code>preprocessCompress</code> must be called before this method
@@ -63,6 +63,12 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * writing to the output file.
      */
     public int compress(InputStream in, OutputStream out, boolean force) throws IOException {
+        PriorityQueue314 queue = new PriorityQueue314();
+        while (queue.size() > 1) {
+            TreeNode left = queue.poll();
+            TreeNode right = queue.poll();
+            queue.add(new TreeNode(left, -1, right));
+        }
         throw new IOException("compress is not implemented");
         //return 0;
     }
@@ -77,8 +83,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * writing to the output file.
      */
     public int uncompress(InputStream in, OutputStream out) throws IOException {
-	        throw new IOException("uncompress not implemented");
-	        //return 0;
+        throw new IOException("uncompress not implemented");
+        //return 0;
     }
 
     public void setViewer(IHuffViewer viewer) {
