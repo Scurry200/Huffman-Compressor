@@ -10,7 +10,8 @@ public class PriorityQueue314 {
     public boolean add(TreeNode node) {
         int index = 0;
         for (TreeNode temp : con) {
-            if (temp.compareTo(node) > 0) {
+            if ((temp.compareTo(node) > 0) || (temp.compareTo(node) == 0 &&
+                (node.getValue() != -1 && node.getValue() - temp.getValue() < 0))) {
                 con.add(index, node);
                 return true;
             }

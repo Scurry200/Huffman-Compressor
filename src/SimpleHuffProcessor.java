@@ -23,6 +23,8 @@ import java.io.OutputStream;
 public class SimpleHuffProcessor implements IHuffProcessor {
 
     private IHuffViewer myViewer;
+    private TreeNode root;
+
 
     /**
      * Preprocess data so that compression is possible ---
@@ -75,6 +77,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
 
     private int decode() throws IOException {
+        TreeNode currNode = root;
         //throw new IOException(){
         BitInputStream bitsIn = new BitInputStream("a6_feedback.txt");
             boolean done = false;
@@ -84,6 +87,18 @@ public class SimpleHuffProcessor implements IHuffProcessor {
                     throw new IOException("error reading compressed " +
                         "file");
                 } else {
+                    if (bit == 0) {
+                        currNode = currNode.getLeft();
+                    } else if (bit == 1) {
+                        currNode = currNode.getRight();
+                    }
+                    if (currNode.isLeaf()) {
+                      // if(val is the pseudo end of file value) {
+                        // done == true; }
+                    } else {
+
+                    }
+
 
                 }
             }

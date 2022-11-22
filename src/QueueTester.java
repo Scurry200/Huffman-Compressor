@@ -1,19 +1,24 @@
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class QueueTester {
-    public static void main(String[] args) {
-        ArrayList<TreeNode> list = new ArrayList<>();
-        list.add(new TreeNode(0, 1));
-        list.add(new TreeNode(1, 4));
-        list.add(new TreeNode(2, 1));
-        list.add(new TreeNode(3, 1));
-        list.add(new TreeNode(4, 2));
-        list.add(new TreeNode(5, 2));
-        list.add(new TreeNode(6, 1));
-        list.add(new TreeNode(7, 4));
+    public static void main(String[] args) throws IOException {
+        char[] ascii = new char[257];
+        BitInputStream bits = new BitInputStream("smallTxt.txt");
+        int read = 0;
+        while (read != -1) {
+            read = bits.read();
+            if (read != -1) {
+                ascii[read]++;
+            }
+        }
+        ascii[256] = 1;
         PriorityQueue314 queue = new PriorityQueue314();
-        for (TreeNode node : list) {
-            queue.add(node);
+        for (int i = 0; i < ascii.length; i++) {
+            if (ascii[i] != 0) {
+                queue.add(new TreeNode(i, ascii[i]));
+            }
         }
         while (queue.size() > 1) {
             TreeNode left = queue.poll();
