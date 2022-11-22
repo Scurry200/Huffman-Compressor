@@ -73,6 +73,24 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         //return 0;
     }
 
+
+    private int decode() throws IOException {
+        //throw new IOException(){
+        BitInputStream bitsIn = new BitInputStream("a6_feedback.txt");
+            boolean done = false;
+            while (!done) {
+                int bit = bitsIn.readBits(1);
+                if (bit == -1) {
+                    throw new IOException("error reading compressed " +
+                        "file");
+                } else {
+
+                }
+            }
+        //}
+        return 0;
+    }
+
     /**
      * Uncompress a previously compressed stream in, writing the
      * uncompressed bits/data to out.
