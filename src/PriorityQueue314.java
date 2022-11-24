@@ -21,6 +21,10 @@ public class PriorityQueue314 {
         return true;
     }
 
+    public TreeNode peek() {
+        return con.getFirst();
+    }
+
     public TreeNode poll() {
         return con.removeFirst();
     }
@@ -28,4 +32,5 @@ public class PriorityQueue314 {
     public int size() {
         return con.size();
     }
+
 }

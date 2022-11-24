@@ -23,7 +23,15 @@ import java.io.OutputStream;
 public class SimpleHuffProcessor implements IHuffProcessor {
 
     private IHuffViewer myViewer;
-    private TreeNode root;
+    private char[] ascii;
+    private PriorityQueue314 queue;
+
+    public SimpleHuffProcessor() {
+        ascii = new char[257];
+        queue = new PriorityQueue314();
+    }
+
+
 
 
     /**
@@ -44,10 +52,36 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * @throws IOException if an error occurs while reading from the input file.
      */
     public int preprocessCompress(InputStream in, int headerFormat) throws IOException {
-        showString("Not working yet");
-        myViewer.update("Still not working");
-        throw new IOException("preprocess not implemented");
-        //return 0;
+        int allBits = 0;
+        BitInputStream bits = new BitInputStream("smallTxt.txt");
+        int read = 0;
+        while (read != -1) {
+            read = bits.read();
+            if (read != -1) {
+                ascii[read]++;
+                allBits++;
+            }
+        }
+        ascii[256] = 1;
+        allBits++;
+        for (int i = 0; i < ascii.length; i++) {
+            if (ascii[i] != 0) {
+                queue.add(new TreeNode(i, ascii[i]));
+            }
+        }
+        PriorityQueue314 queue = new PriorityQueue314();
+        while (queue.size() > 1) {
+            TreeNode left = queue.poll();
+            TreeNode right = queue.poll();
+            queue.add(new TreeNode(left, -1, right));
+        }
+        final int bitsPerByte = 8;
+        int totalBitsRemainder = allBits % 8;
+        if (totalBitsRemainder != 0) {
+            totalBitsRemainder += (bitsPerByte - totalBitsRemainder);
+        }
+        int totalActualBits = allBits + totalBitsRemainder;
+        return totalActualBits - allBits;
     }
 
     /**
@@ -65,19 +99,14 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * writing to the output file.
      */
     public int compress(InputStream in, OutputStream out, boolean force) throws IOException {
-        PriorityQueue314 queue = new PriorityQueue314();
-        while (queue.size() > 1) {
-            TreeNode left = queue.poll();
-            TreeNode right = queue.poll();
-            queue.add(new TreeNode(left, -1, right));
-        }
+
         throw new IOException("compress is not implemented");
         //return 0;
     }
 
 
     private int decode() throws IOException {
-        TreeNode currNode = root;
+        TreeNode currNode = queue.peek();
         //throw new IOException(){
         BitInputStream bitsIn = new BitInputStream("a6_feedback.txt");
             boolean done = false;
@@ -93,16 +122,15 @@ public class SimpleHuffProcessor implements IHuffProcessor {
                         currNode = currNode.getRight();
                     }
                     if (currNode.isLeaf()) {
-                      // if(val is the pseudo end of file value) {
-                        // done == true; }
+                        if (bit == 256) {
+                            done = true;
+                        }
                     } else {
-
+                        ascii[bit]++;
+                        currNode = queue.peek();
                     }
-
-
                 }
             }
-        //}
         return 0;
     }
 
