@@ -26,23 +26,52 @@ public class QueueTester {
             queue.add(new TreeNode(left, -1, right));
         }
         TreeNode root = queue.poll();
-        HashMap<TreeNode, String> map = new HashMap<>();
-        inOrder(root, map);
-        for (TreeNode node : map.keySet()) {
-            map.put(node, getByte(root, node));
+        ArrayList<TreeNode> nodes = new ArrayList<>();
+        inOrder(root, nodes);
+        HashMap<Integer, String> map = new HashMap<>();
+        for (TreeNode node : nodes) {
+            map.put(node.getValue(), getByte(root, node));
         }
-        System.out.println(queue);
+        bits.reset();
+        read = 0;
+        String binary = "";
+        while (read != -1) {
+            read = bits.read();
+            if (read != -1) {
+                binary += map.get(read);
+            }
+        }
+        binary += map.get(256);
+        ArrayList<Integer> decode = new ArrayList<>();
+        help(root, root, binary, decode);
+        for (Integer x : decode) {
+            System.out.print((char) (x.intValue()));
+        }
     }
 
-    private static void inOrder(TreeNode node, HashMap<TreeNode, String> map) {
+
+    private static void help(TreeNode root, TreeNode node, String val, ArrayList<Integer> result) {
+        if (node.getValue() != -1) {
+            result.add(node.getValue());
+            node = root;
+        } if (val.length() != 0) {
+            if (val.charAt(0) == '0') {
+                help(root, node.getLeft(), val.substring(1), result);
+            } else {
+                help(root, node.getRight(), val.substring(1), result);
+            }
+        }
+    }
+
+    private static void inOrder(TreeNode node, ArrayList<TreeNode> list) {
         if (node.getLeft() != null) {
-            inOrder(node.getLeft(), map);
+            inOrder(node.getLeft(), list);
         }
         if (node.getValue() != -1) {
-            map.put(node, "");
+            list.add(node);
         }
         if (node.getRight() != null) {
-            inOrder(node.getRight(), map);
+            inOrder(node.getRight(), list);
         }
     }
 
