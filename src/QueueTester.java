@@ -42,25 +42,29 @@ public class QueueTester {
             }
         }
         binary += map.get(256);
-        ArrayList<Integer> decode = new ArrayList<>();
-        help(root, root, binary, decode);
-        for (Integer x : decode) {
-            System.out.print((char) (x.intValue()));
-        }
+        StringBuilder decode = help(root, binary);
+        System.out.println(decode.toString());
     }
 
 
-    private static void help(TreeNode root, TreeNode node, String val, ArrayList<Integer> result) {
-        if (node.getValue() != -1) {
-            result.add(node.getValue());
-            node = root;
-        } if (val.length() != 0) {
-            if (val.charAt(0) == '0') {
-                help(root, node.getLeft(), val.substring(1), result);
-            } else {
-                help(root, node.getRight(), val.substring(1), result);
+    private static StringBuilder help(TreeNode root, String val) {
+        StringBuilder result = new StringBuilder();
+        String str = val;
+        TreeNode temp = root;
+        while (str.length() != 0) {
+            if (temp.getValue() != -1) {
+                result.append((char) (temp.getValue()));
+                temp = root;
+            } else if (str.charAt(0) == '0') {
+                temp = temp.getLeft();
+                str = str.substring(1);
+            } else if (str.charAt(0) == '1') {
+                temp = temp.getRight();
+                str = str.substring(1);
             }
         }
+        result.append((char) (temp.getValue()));
+        return result;
     }
 
     private static void inOrder(TreeNode node, ArrayList<TreeNode> list) {
