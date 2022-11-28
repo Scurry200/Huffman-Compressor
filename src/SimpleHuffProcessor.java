@@ -19,12 +19,15 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SimpleHuffProcessor implements IHuffProcessor {
 
     private IHuffViewer myViewer;
     private char[] ascii;
     private PriorityQueue314 queue;
+    private int format;
 
     public SimpleHuffProcessor() {
         ascii = new char[257];
@@ -52,36 +55,100 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * @throws IOException if an error occurs while reading from the input file.
      */
     public int preprocessCompress(InputStream in, int headerFormat) throws IOException {
-        int allBits = 0;
-        BitInputStream bits = new BitInputStream("smallTxt.txt");
+        format = headerFormat;
+
+        BitInputStream bits = new BitInputStream(in);
         int read = 0;
         while (read != -1) {
             read = bits.read();
             if (read != -1) {
                 ascii[read]++;
-                allBits++;
+
             }
         }
-        ascii[256] = 1;
-        allBits++;
+        ascii[ALPH_SIZE] = 1;
         for (int i = 0; i < ascii.length; i++) {
             if (ascii[i] != 0) {
                 queue.add(new TreeNode(i, ascii[i]));
             }
         }
-        PriorityQueue314 queue = new PriorityQueue314();
+        //PriorityQueue314 queue = new PriorityQueue314();
         while (queue.size() > 1) {
             TreeNode left = queue.poll();
             TreeNode right = queue.poll();
             queue.add(new TreeNode(left, -1, right));
         }
-        final int bitsPerByte = 8;
-        int totalBitsRemainder = allBits % 8;
-        if (totalBitsRemainder != 0) {
-            totalBitsRemainder += (bitsPerByte - totalBitsRemainder);
+        TreeNode root = queue.poll();
+        ArrayList<TreeNode> nodes = new ArrayList<>();
+        inOrder(root, nodes);
+        HashMap<Integer, String> map = new HashMap<>();
+        for (TreeNode node : nodes) {
+            map.put(node.getValue(), getByte(root, node));
         }
-        int totalActualBits = allBits + totalBitsRemainder;
-        return totalActualBits - allBits;
+        return findingOriginalBits() - findingCompressedBits(map, root);
+    }
+
+    private int findingOriginalBits() {
+        int bits = 0;
+        for (int i = 0; i < ALPH_SIZE - 1; i++) {
+            bits += BITS_PER_WORD * ascii[i];
+        }
+        return bits;
+    }
+
+    private int findingCompressedBits(HashMap<Integer, String> map, TreeNode root) {
+        int compressed = 2 * BITS_PER_INT;
+        for (int key: map.keySet()) {
+            compressed += ascii[key] * map.get(key).length();
+        }
+        if (format == STORE_COUNTS) {
+            compressed += ALPH_SIZE * BITS_PER_INT;
+        }
+        if (format == STORE_TREE) {
+            compressed += BITS_PER_INT;
+            compressed += goingThroughTree(root);
+        }
+        return compressed;
+    }
+
+    private int goingThroughTree(TreeNode temp) {
+        //goes through tree finding total bits
+        if (temp.isLeaf()) {
+            return 1 + BITS_PER_WORD + 1; //1 for node, 9 for bits per leaf node
+        } else {
+            return 1 + goingThroughTree(temp.getLeft()) + goingThroughTree(temp.getRight());
+        }
+    }
+
+
+    private static void inOrder(TreeNode node, ArrayList<TreeNode> list) {
+        if (node.getLeft() != null) {
+            inOrder(node.getLeft(), list);
+        }
+        if (node.getValue() != -1) {
+            list.add(node);
+        }
+        if (node.getRight() != null) {
+            inOrder(node.getRight(), list);
+        }
+    }
+
+    private static String getByte(TreeNode root, TreeNode node) {
+        return get(root, new String(), node.getValue());
+    }
+
+    private static String get(TreeNode node, String val, int bite) {
+        if (node == null) {
+            return null;
+        }
+        if (node.getValue() == bite) {
+            return val;
+        }
+        String temp = get(node.getLeft(), val + "0", bite);
+        if (temp != null) {
+            return temp;
+        }
+        return get(node.getRight(), val + "1", bite);
     }
 
     /**
