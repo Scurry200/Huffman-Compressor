@@ -1,6 +1,10 @@
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Class that deals with anything relevant to compressing a file, including preprocess
+ */
+
 public class Compress {
     private int[] ascii;
     private int format;
@@ -8,6 +12,14 @@ public class Compress {
     private int originalBits;
     private HuffmanTree tree;
 
+    /**
+     * @param inputStream helps read file
+     * @param  header is header value
+     * general constructor for compress object to do preprocess work
+     * pre: none
+     * post: should be finished with all preprocess completed
+     * @throws IOException if an error occurs while reading from the input file.
+     */
     public Compress(BitInputStream inputStream, int header) throws IOException {
         format = header;
         ascii = new int[IHuffConstants.ALPH_SIZE + 1];
@@ -22,6 +34,10 @@ public class Compress {
         findingCompressedBits(tree.getTree(), header);
     }
 
+    /**
+     * simple method to calculate bits saved
+     * @return value for what should be returned for compress and preprocesscompress
+     */
     public int bitsSaved() {
         return originalBits - compressedBits;
     }
@@ -43,7 +59,8 @@ public class Compress {
                 }
             }
             int sizeInternal = nodes.size() - count;
-            outputStream.writeBits(IHuffConstants.BITS_PER_INT, (sizeInternal + (count * (IHuffConstants.BITS_PER_WORD + 2))));
+            outputStream.writeBits(IHuffConstants.BITS_PER_INT, (sizeInternal +
+                (count * (IHuffConstants.BITS_PER_WORD + 2))));
             preOrderHelp(outputStream, tree.getTree());
         }
         int read = inputStream.read();
@@ -56,11 +73,19 @@ public class Compress {
         return compressedBits;
     }
 
+    /**
+     * pre: none
+     * post: returns format value
+     * returns format value
+     * @return format value
+     */
     public int getFormat() {
         return format;
     }
 
     /**
+     * @param outputStream is stream that writes bits to a file
+     * @param huffCode is the huffcode of a node value in the tree
      * pre: none
      * post: goes through a huffcode to write bits for compressed file
      * method meant for writing bit by bit based on huffman code from a tree node
@@ -87,6 +112,8 @@ public class Compress {
     }
 
     /**
+     * @param outputStream helps write file
+     * @param node is the current node that the method traversed through in tree
      * pre: none
      * post: should write all node leaf values that should be in the compressed file, 1 bit for
      * internal nodes, 10 total bits for leaf node data
@@ -118,7 +145,8 @@ public class Compress {
         }
     }
 
-    /**
+    /** @param root is node that the method traversed through in tree
+     * @param header finds header type
      * pre: none
      * post: should calculate the number of bits that should be in the compressed file
      * method meant for calculating the number of bits that will be in the compressed file based
