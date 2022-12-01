@@ -120,35 +120,14 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         }
     }
 
-
-    private static void inOrder(TreeNode node, ArrayList<TreeNode> list) {
+    private void preOrder(TreeNode node, ArrayList<TreeNode> list) {
+        list.add(node);
         if (node.getLeft() != null) {
-            inOrder(node.getLeft(), list);
-        }
-        if (node.getValue() != -1) {
-            list.add(node);
+            preOrder(node.getLeft(), list);
         }
         if (node.getRight() != null) {
-            inOrder(node.getRight(), list);
+            preOrder(node.getRight(), list);
         }
-    }
-
-    private static String getByte(TreeNode root, TreeNode node) {
-        return get(root, new String(), node.getValue());
-    }
-
-    private static String get(TreeNode node, String val, int bite) {
-        if (node == null) {
-            return null;
-        }
-        if (node.getValue() == bite) {
-            return val;
-        }
-        String temp = get(node.getLeft(), val + "0", bite);
-        if (temp != null) {
-            return temp;
-        }
-        return get(node.getRight(), val + "1", bite);
     }
 
     /**
