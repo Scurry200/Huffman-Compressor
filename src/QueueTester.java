@@ -3,9 +3,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class QueueTester {
-/*    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         char[] ascii = new char[257];
-        BitInputStream bits = new BitInputStream("smallTxt.txt");
+        BitInputStream bits = new BitInputStream("C:\\Users\\sherw\\Downloads\\ciaFactBook2008.txt");
         //Reads file data and puts int an array of ints where the index corresponds to character and value to frequency
         int read = 0;
         while (read != -1) {
@@ -106,5 +106,5 @@ public class QueueTester {
             return temp;
         }
         return get(node.getRight(), val + "1", bite);
-    }*/
+    }
 }
