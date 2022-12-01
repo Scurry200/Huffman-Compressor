@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 
-public class PriorityQueue314 {
-    private LinkedList<TreeNode> con;
+public class PriorityQueue314<E extends Comparable<E>> {
+    private LinkedList<E> con;
 
     /**
      * Constructor using LinkedList as container
@@ -15,11 +15,10 @@ public class PriorityQueue314 {
      * @param node TreeNode being added in order
      * @return If value has been added
      */
-    public boolean add(TreeNode node) {
+    public boolean add(E node) {
         int index = 0;
-        for (TreeNode temp : con) {
-            if ((temp.compareTo(node) > 0) || (temp.compareTo(node) == 0 &&
-                (node.getValue() != -1 && node.getValue() - temp.getValue() < 0))) {
+        for (E temp : con) {
+            if (temp.compareTo(node) > 0) {
                 con.add(index, node);
                 return true;
             }
@@ -33,7 +32,7 @@ public class PriorityQueue314 {
      * Returns top of queue
      * @return first value in con
      */
-    public TreeNode peek() {
+    public E peek() {
         return con.getFirst();
     }
 
@@ -41,7 +40,7 @@ public class PriorityQueue314 {
      * Removes and returns top of queue
      * @return first value in con
      */
-    public TreeNode poll() {
+    public E poll() {
         return con.removeFirst();
     }
 

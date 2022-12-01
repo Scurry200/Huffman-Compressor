@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * Huffman coding class that has functions to compress data, uncompress data, based on
@@ -32,6 +30,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
 
     private IHuffViewer myViewer;
     private int[] ascii;
+    private Compress comp;
     private HuffmanTree tree;
     private int format;
     private int compressedBits;
@@ -83,6 +82,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         tree = new HuffmanTree(ascii);
         findingCompressedBits(tree.getTree());
         return findingOriginalBits() - compressedBits;
+         */
     }
     /**
      * pre: none
@@ -260,6 +260,20 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * writing to the output file.
      */
     public int uncompress(InputStream in, OutputStream out) throws IOException {
+        BitInputStream inputStream = new BitInputStream(in);
+        BitOutputStream outputStream = new BitOutputStream(out);
+        int magic = inputStream.readBits(BITS_PER_INT);
+        if (magic != MAGIC_NUMBER) {
+            myViewer.showError("Error reading compressed file. \n" +
+                "File did not start with the huff magic number.");
+            return -1;
+        }
+        if (myViewer != null) {
+            Uncompress uncomp = new Uncompress(inputStream);
+            return uncomp.unhuff(inputStream, outputStream);
+        }
+        throw new IllegalArgumentException("myviewer is null");
+        /*
         int returnVal = 0;
         BitInputStream inputStream = new BitInputStream(in);
         BitOutputStream outputStream = new BitOutputStream(out);
@@ -288,8 +302,14 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         }
         returnVal += hf.goThroughTreeToWrite(inputStream, outputStream);
         return returnVal;
+
+         */
     }
 
+    /**
+     * Make sure this model communicates with some view.
+     * @param viewer is the view for communicating.
+     */
     public void setViewer(IHuffViewer viewer) {
         myViewer = viewer;
     }

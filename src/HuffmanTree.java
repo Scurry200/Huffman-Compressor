@@ -16,6 +16,10 @@ public class HuffmanTree {
      */
     public HuffmanTree(BitInputStream inputStream) throws IOException {
         this.root = buildTree(inputStream);
+        LinkedList<TreeNode> nodes = new LinkedList<>();
+        huffMap = new HashMap<>();
+        inOrder(root, nodes);
+        fillMap(nodes);
     }
 
 
@@ -28,7 +32,7 @@ public class HuffmanTree {
      */
 
     public HuffmanTree(int[] freq) {
-        PriorityQueue314 queue = new PriorityQueue314();
+        PriorityQueue314<TreeNode> queue = new PriorityQueue314<>();
         LinkedList<TreeNode> nodes = new LinkedList<>();
         huffMap = new HashMap<>();
         for (int i = 0; i < freq.length; i++) {
@@ -55,14 +59,12 @@ public class HuffmanTree {
     private TreeNode buildTree(BitInputStream inputStream) throws IOException {
         int bit = inputStream.readBits(1);
         if (bit == 0) {
-            TreeNode nodeInternal = new TreeNode(buildTree(inputStream), -1, buildTree(inputStream));
             //nodeInternal.setLeft(buildTree(inputStream));
             //nodeInternal.setRight(buildTree(inputStream));
-            return nodeInternal;
+            return new TreeNode(buildTree(inputStream), -1, buildTree(inputStream));
         } else if (bit == 1) {
-            int leafVal = inputStream.readBits(9);
-            TreeNode nodeLeaf = new TreeNode(leafVal, -1);
-            return nodeLeaf;
+            int leafVal = inputStream.readBits(1 + IHuffConstants.BITS_PER_WORD);
+            return new TreeNode(leafVal, -1);
         } else {
             throw new IllegalArgumentException("error with reading");
         }
@@ -128,7 +130,7 @@ public class HuffmanTree {
         return get(node.getRight(), val + "1", bite);
     }
 
-    public int goThroughTreeToWrite(BitInputStream inputStream, BitOutputStream outputStream)
+    public int writeTree(BitInputStream inputStream, BitOutputStream outputStream)
         throws IOException {
         TreeNode node = getTree();
         boolean done = false;
@@ -167,10 +169,6 @@ public class HuffmanTree {
 
     public HashMap<Integer, String> getMap() {
         return huffMap;
-    }
-
-    public void setTree(TreeNode node) {
-        root = node;
     }
 
 
