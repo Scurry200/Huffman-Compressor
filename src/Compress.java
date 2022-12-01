@@ -42,6 +42,13 @@ public class Compress {
         return originalBits - compressedBits;
     }
 
+    /**
+     *
+     * @param inputStream is stream of input data to read
+     * @param outputStream helps write file
+     * @return total compressed bits
+     * @throws IOException if an error occurs while reading/writing from the input/output file.
+     */
     public int huff(BitInputStream inputStream, BitOutputStream outputStream) throws IOException {
         outputStream.writeBits(IHuffConstants.BITS_PER_INT, IHuffConstants.MAGIC_NUMBER);
         outputStream.writeBits(IHuffConstants.BITS_PER_INT, format);
@@ -51,7 +58,7 @@ public class Compress {
             }
         } else if (format == IHuffConstants.STORE_TREE) {
             ArrayList<TreeNode> nodes = new ArrayList<>();
-            preOrder(tree.getTree(), nodes);
+            tree.preOrder(tree.getTree(), nodes);
             int count = 0;
             for (TreeNode node : nodes) {
                 if (node.isLeaf()) {
@@ -93,21 +100,6 @@ public class Compress {
     private void sequenceConverting(String huffCode, BitOutputStream outputStream) {
         for (int i = 0; i < huffCode.length(); i++) {
             outputStream.writeBits(1, Integer.parseInt(huffCode.substring(i, i+1)));
-        }
-    }
-
-    /**
-     * pre: none
-     * post: should have a list of all the nodes in the huffman tree
-     * recursively goes through the tree and adds all the nodes in the huffman tree
-     */
-    private void preOrder(TreeNode node, ArrayList<TreeNode> list) {
-        list.add(node);
-        if (node.getLeft() != null) {
-            preOrder(node.getLeft(), list);
-        }
-        if (node.getRight() != null) {
-            preOrder(node.getRight(), list);
         }
     }
 
