@@ -1,14 +1,31 @@
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+/**
+    Huffman tree class that builds a huffman tree or goes through the tree to interpret tree data
+ */
 
 public class HuffmanTree {
     private TreeNode root;
     private HashMap<Integer, String> huffMap;
 
+    /**
+     * pre: none
+     * post: should create a tree based in the inputstream of characters
+     * constructors to build tree for store tree format
+     */
     public HuffmanTree(BitInputStream inputStream) throws IOException {
         this.root = buildTree(inputStream);
     }
+
+
+    /**
+     * pre: none
+     * post: should create a tree based on the ascii frequency arrays
+     * constructors to build tree for store count format
+     * goes through array to create nodes, and will eventually create a priority queue,
+     * that ends up creating a huffman tree, also creates huffman tree map
+     */
 
     public HuffmanTree(int[] freq) {
         PriorityQueue314 queue = new PriorityQueue314();
@@ -29,6 +46,12 @@ public class HuffmanTree {
         fillMap(nodes);
     }
 
+    /**
+     * pre: none
+     * post: should create a tree based on inputstream codes
+     * builds a tree based on the input stream of huffman codes
+     * @return huffman tree from inputstream of codes
+     */
     private TreeNode buildTree(BitInputStream inputStream) throws IOException {
         int bit = inputStream.readBits(1);
         if (bit == 0) {
@@ -45,6 +68,12 @@ public class HuffmanTree {
         }
     }
 
+    /**
+     * pre: none
+     * post: should get a linkedlist of all the nodes in tree
+     * goes through huffman tree and adds each node into list
+     */
+
     private void inOrder(TreeNode node, LinkedList<TreeNode> list) {
         if (node.getLeft() != null) {
             inOrder(node.getLeft(), list);
@@ -57,9 +86,31 @@ public class HuffmanTree {
         }
     }
 
+    /**
+     * pre: none
+     * post: should create a map with all the node values with huffman codes
+     * goes through list of nodes to find the huffman codes for each node in tree
+     */
+
     private void fillMap(LinkedList<TreeNode> nodes) {
         for (TreeNode node : nodes) {
             huffMap.put(node.getValue(), get(root, "", node.getValue()));
+        }
+    }
+
+    /**
+     * pre: none
+     * post: should calculate the number of bits that is in the huffman tree
+     * method meant for calculating the number of bits that will be in the compressed file
+     * whenever format is supposed to be store tree
+     * @return bits in the binary tree from the root to the leaves
+     */
+    public int goingThroughTree(TreeNode temp) {
+        //goes through tree finding total bits
+        if (temp.isLeaf()) {
+            return 1 + IHuffConstants.BITS_PER_WORD + 1; //1 for node, 9 for bits per leaf node
+        } else {
+            return 1 + goingThroughTree(temp.getLeft()) + goingThroughTree(temp.getRight());
         }
     }
 
