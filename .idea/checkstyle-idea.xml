@@ -10,6 +10,7 @@
       <list>
         <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
         <ConfigurationLocation id="bundled-google-checks" type="BUNDLED" scope="All" description="Google Checks">(bundled)</ConfigurationLocation>
+        <ConfigurationLocation id="645d8916-be64-49a0-93cf-822041a5bfc3" type="LOCAL_FILE" scope="All" description="cs314">$USER_HOME$/Downloads/utexas-cs314-public-main (1)/utexas-cs314-public-main/cs314.checkstyle.xml</ConfigurationLocation>
       </list>
     </option>
   </component>

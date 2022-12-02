@@ -1,14 +1,14 @@
 /*  Student information for assignment:
  *
- *  On <MY|OUR> honor, <NAME1> and <NAME2), this programming assignment is <MY|OUR> own work
- *  and <I|WE> have not provided this code to any other student.
+ *  On Our honor, Sherwin Amal and Ayaan Nazir, this programming assignment is Our own work
+ *  and We have not provided this code to any other student.
  *
- *  Number of slip days used:
+ *  Number of slip days used: 2
  *
  *  Student 1 (Student whose Canvas account is being used)
- *  UTEID:
- *  email address:
- *  Grader name:
+ *  UTEID: sa53879
+ *  email address: sherwinamal@utexas.edu
+ *  Grader name: Skyler
  *
  *  Student 2
  *  UTEID:
@@ -19,7 +19,6 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 
 /**
  * Huffman coding class that has functions to compress data, uncompress data, based on
@@ -60,9 +59,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * @throws IOException if an error occurs while reading from the input file.
      */
     public int preprocessCompress(InputStream in, int headerFormat) throws IOException {
-        if (myViewer != null) {
-            comp = new Compress(new BitInputStream(in), headerFormat);
-            return comp.bitsSaved();
+        if (myViewer == null) {
+
         }
         throw new IllegalArgumentException("myviewer is null");
         /*
@@ -173,47 +171,17 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         // but this is after we put in header format, magic number, header, and at the end we
         // include peof (but that's already stored in the map)
         if (comp.getFormat() != STORE_COUNTS && comp.getFormat() != STORE_TREE) {
-            throw new IllegalArgumentException("format is not right");
+            //myViewer.showError("format is neither store counts or storetree");
         }
         if (!force && comp.bitsSaved() < 0) {
-            myViewer.showMessage("you don't save any bits");
+            //myViewer.showMessage("you don't save any bits, so no need to have file");
             return 0;
         }
-        if (myViewer != null) {
-            return comp.huff(new BitInputStream(in), new BitOutputStream(out));
-        }
-        throw new IllegalArgumentException("viewer is null");
-        /*
-        BitInputStream inputStream = new BitInputStream(in);
-        BitOutputStream bitOutputStream = new BitOutputStream(out);
-        bitOutputStream.writeBits(BITS_PER_INT, MAGIC_NUMBER);
-        bitOutputStream.writeBits(BITS_PER_INT, format);
-        if (format == STORE_COUNTS) {
-            for(int i = 0; i < ALPH_SIZE; i++) {
-                bitOutputStream.writeBits(BITS_PER_INT, ascii[i]);
-            }
-        } else if (format == STORE_TREE) {
-            ArrayList<TreeNode> nodes = new ArrayList<>();
-            preOrder(tree.getTree(), nodes);
-            int count = 0;
-            for (TreeNode node : nodes) {
-                if (node.isLeaf()) {
-                    count++;
-                }
-            }
-            int sizeInternal = nodes.size() - count;
-            bitOutputStream.writeBits(BITS_PER_INT, (sizeInternal + (count * (BITS_PER_WORD + 2))));
-            preOrderHelp(bitOutputStream, tree.getTree());
-        }
-        int read = inputStream.read();
-        while (read != -1) {
-            sequenceConverting(tree.getMap().get(read), bitOutputStream);
-            read = inputStream.read();
-        }
-        sequenceConverting(tree.getMap().get(ALPH_SIZE), bitOutputStream);
-        bitOutputStream.close();
-        return compressedBits;
-         */
+        //if (myViewer != null) {
+            return comp.huff(new BitInputStream(in), new BitOutputStream(out), myViewer);
+        //}
+        //throw new IllegalArgumentException("viewer is null");
+        //return 0;
     }
 
 
@@ -264,8 +232,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         BitOutputStream outputStream = new BitOutputStream(out);
         int magic = inputStream.readBits(BITS_PER_INT);
         if (magic != MAGIC_NUMBER) {
-            myViewer.showError("Error reading compressed file. \n" +
-                "File did not start with the huff magic number.");
+            //myViewer.showError("Error reading compressed file. \n" +
+                //"File did not start with the huff magic number.");
             return -1;
         }
         if (myViewer != null) {
@@ -314,7 +282,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         myViewer = viewer;
     }
 
-    private void showString(String s){
+    private void showString(String s) {
         if (myViewer != null) {
             myViewer.update(s);
         }

@@ -20,7 +20,8 @@ public class Compress {
      * post: should be finished with all preprocess completed
      * @throws IOException if an error occurs while reading from the input file.
      */
-    public Compress(BitInputStream inputStream, int header) throws IOException {
+    public Compress(BitInputStream inputStream, int header, IHuffViewer view)
+        throws IOException {
         format = header;
         ascii = new int[IHuffConstants.ALPH_SIZE + 1];
         int read = inputStream.read();
@@ -28,13 +29,18 @@ public class Compress {
             ascii[read]++;
             read = inputStream.read();
         }
+        //view.showMessage("finished with frequency array");
         ascii[IHuffConstants.ALPH_SIZE] = 1;
         tree = new HuffmanTree(ascii);
+        //view.showMessage("created huffman tree");
+        //view.showMessage("saved bits are:" + bitsSaved());
         findingOriginalBits();
         findingCompressedBits(tree.getTree(), header);
     }
 
     /**
+     * pre: none
+     * post: returns original bits minus compressed bits
      * simple method to calculate bits saved
      * @return value for what should be returned for compress and preprocesscompress
      */
@@ -56,6 +62,7 @@ public class Compress {
             for(int i = 0; i < IHuffConstants.ALPH_SIZE; i++) {
                 outputStream.writeBits(IHuffConstants.BITS_PER_INT, ascii[i]);
             }
+            //view.showMessage("done with store count header writing");
         } else if (format == IHuffConstants.STORE_TREE) {
             ArrayList<TreeNode> nodes = new ArrayList<>();
             tree.preOrder(tree.getTree(), nodes);
@@ -69,13 +76,10 @@ public class Compress {
             outputStream.writeBits(IHuffConstants.BITS_PER_INT, (sizeInternal +
                 (count * (IHuffConstants.BITS_PER_WORD + 2))));
             preOrderHelp(outputStream, tree.getTree());
+            //view.showMessage("done with store tree header writing");
         }
-        int read = inputStream.read();
-        while (read != -1) {
-            sequenceConverting(tree.getMap().get(read), outputStream);
-            read = inputStream.read();
-        }
-        sequenceConverting(tree.getMap().get(IHuffConstants.ALPH_SIZE), outputStream);
+        compressData(inputStream, outputStream);
+        //view.showMessage("done with compressing");
         outputStream.close();
         return compressedBits;
     }
