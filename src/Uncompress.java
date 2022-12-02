@@ -33,7 +33,8 @@ public class Uncompress {
      * @return bits in uncompressed file
      * @throws IOException if an error occurs while reading/writing from the input/output file.
      */
-    public int unhuff(BitInputStream inputStream, BitOutputStream outputStream) throws IOException {
+    public int unhuff(BitInputStream inputStream, BitOutputStream outputStream)
+        throws IOException {
         return hf.writeTree(inputStream, outputStream);
     }
 

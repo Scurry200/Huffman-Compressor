@@ -100,11 +100,7 @@ public class HuffmanTree {
                 throw new IOException("Error reading compressed file. \n" +
                     "unexpected end of input. No PSEUDO_EOF value.");
             } else {
-                if (bit == 0) {
-                    node = node.getLeft();
-                } else if (bit == 1) {
-                    node = node.getRight();
-                }
+                node = (bit == 0) ? node.getLeft() : node.getRight();
                 if (node.isLeaf()) {
                     if (node.getValue() == IHuffConstants.ALPH_SIZE) {
                         done = true;
@@ -119,10 +115,18 @@ public class HuffmanTree {
         return count;
     }
 
+    /**
+     * getter for tree
+     * @return the root of tree
+     */
     public TreeNode getTree() {
         return root;
     }
 
+    /**
+     * getter for map
+     * @return the map
+     */
     public HashMap<Integer, String> getMap() {
         return huffMap;
     }

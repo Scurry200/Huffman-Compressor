@@ -49,13 +49,14 @@ public class Compress {
     }
 
     /**
-     *
+     * Compresses the data of the file
      * @param inputStream is stream of input data to read
      * @param outputStream helps write file
      * @return total compressed bits
      * @throws IOException if an error occurs while reading/writing from the input/output file.
      */
-    public int huff(BitInputStream inputStream, BitOutputStream outputStream) throws IOException {
+    public int huff(BitInputStream inputStream, BitOutputStream outputStream, IHuffViewer view)
+        throws IOException {
         outputStream.writeBits(IHuffConstants.BITS_PER_INT, IHuffConstants.MAGIC_NUMBER);
         outputStream.writeBits(IHuffConstants.BITS_PER_INT, format);
         if (format == IHuffConstants.STORE_COUNTS) {
@@ -64,15 +65,8 @@ public class Compress {
             }
             //view.showMessage("done with store count header writing");
         } else if (format == IHuffConstants.STORE_TREE) {
-            ArrayList<TreeNode> nodes = new ArrayList<>();
-            tree.preOrder(tree.getTree(), nodes);
-            int count = 0;
-            for (TreeNode node : nodes) {
-                if (node.isLeaf()) {
-                    count++;
-                }
-            }
-            int sizeInternal = nodes.size() - count;
+            int sizeInternal = countInternalNodes();
+            int count = tree.getMap().size();
             outputStream.writeBits(IHuffConstants.BITS_PER_INT, (sizeInternal +
                 (count * (IHuffConstants.BITS_PER_WORD + 2))));
             preOrderHelp(outputStream, tree.getTree());
@@ -82,6 +76,37 @@ public class Compress {
         //view.showMessage("done with compressing");
         outputStream.close();
         return compressedBits;
+    }
+
+    /**
+     * Reads original data and writes the compressed version of it
+     * @param inputStream reads bits from file
+     * @param outputStream writes bits to file
+     * @throws IOException if an error occurs while reading/writing from the input/output file.
+     */
+    private void compressData(BitInputStream inputStream, BitOutputStream outputStream) throws IOException {
+        int read = inputStream.read();
+        while (read != -1) {
+            sequenceConverting(tree.getMap().get(read), outputStream);
+            read = inputStream.read();
+        }
+        sequenceConverting(tree.getMap().get(IHuffConstants.ALPH_SIZE), outputStream);
+    }
+
+    /**
+     * Counts the nodes that aren't leaves
+     * @return internal nodes
+     */
+    private int countInternalNodes() {
+        ArrayList<TreeNode> nodes = new ArrayList<>();
+        tree.preOrder(tree.getTree(), nodes);
+        int count = 0;
+        for (TreeNode node : nodes) {
+            if (node.isLeaf()) {
+                count++;
+            }
+        }
+        return nodes.size() - count;
     }
 
     /**
