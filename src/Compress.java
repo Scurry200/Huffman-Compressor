@@ -29,11 +29,11 @@ public class Compress {
             ascii[read]++;
             read = inputStream.read();
         }
-        //view.showMessage("finished with frequency array");
+        view.showMessage("finished with frequency array");
         ascii[IHuffConstants.ALPH_SIZE] = 1;
         tree = new HuffmanTree(ascii);
-        //view.showMessage("created huffman tree");
-        //view.showMessage("saved bits are:" + bitsSaved());
+        view.showMessage("created huffman tree");
+        view.showMessage("saved bits are:" + bitsSaved());
         findingOriginalBits();
         findingCompressedBits(tree.getTree(), header);
     }
@@ -63,17 +63,17 @@ public class Compress {
             for(int i = 0; i < IHuffConstants.ALPH_SIZE; i++) {
                 outputStream.writeBits(IHuffConstants.BITS_PER_INT, ascii[i]);
             }
-            //view.showMessage("done with store count header writing");
+            view.showMessage("done with store count header writing");
         } else if (format == IHuffConstants.STORE_TREE) {
             int sizeInternal = countInternalNodes();
             int count = tree.getMap().size();
             outputStream.writeBits(IHuffConstants.BITS_PER_INT, (sizeInternal +
                 (count * (IHuffConstants.BITS_PER_WORD + 2))));
             preOrderHelp(outputStream, tree.getTree());
-            //view.showMessage("done with store tree header writing");
+            view.showMessage("done with store tree header writing");
         }
         compressData(inputStream, outputStream);
-        //view.showMessage("done with compressing");
+        view.showMessage("done with compressing");
         outputStream.close();
         return compressedBits;
     }

@@ -46,11 +46,12 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * @throws IOException if an error occurs while reading from the input file.
      */
     public int preprocessCompress(InputStream in, int headerFormat) throws IOException {
-        if (myViewer == null) {
-
+        if (myViewer != null) {
+            comp = new Compress(new BitInputStream(in), headerFormat, myViewer);
+            return comp.bitsSaved();
         }
-        comp = new Compress(new BitInputStream(in), headerFormat, myViewer);
-        return comp.bitsSaved();
+        throw new IllegalArgumentException("viewer is null");
+
     }
 
     /**
@@ -73,16 +74,16 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         // but this is after we put in header format, magic number, header, and at the end we
         // include peof (but that's already stored in the map)
         if (comp.getFormat() != STORE_COUNTS && comp.getFormat() != STORE_TREE) {
-            //myViewer.showError("format is neither store counts or storetree");
+            myViewer.showError("format is neither store counts or storetree");
         }
         if (!force && comp.bitsSaved() < 0) {
-            //myViewer.showMessage("you don't save any bits, so no need to have file");
+            myViewer.showMessage("you don't save any bits, so no need to have file");
             return 0;
         }
-        //if (myViewer != null) {
+        if (myViewer != null) {
             return comp.huff(new BitInputStream(in), new BitOutputStream(out), myViewer);
-        //}
-        //throw new IllegalArgumentException("viewer is null");
+        }
+        throw new IllegalArgumentException("viewer is null");
         //return 0;
     }
 
@@ -100,8 +101,8 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         BitOutputStream outputStream = new BitOutputStream(out);
         int magic = inputStream.readBits(BITS_PER_INT);
         if (magic != MAGIC_NUMBER) {
-            //myViewer.showError("Error reading compressed file. \n" +
-                //"File did not start with the huff magic number.");
+            myViewer.showError("Error reading compressed file. \n" +
+                "File did not start with the huff magic number.");
             return -1;
         }
         if (myViewer != null) {
