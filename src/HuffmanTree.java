@@ -25,6 +25,7 @@ import java.util.LinkedList;
 public class HuffmanTree {
     private TreeNode root;
     private HashMap<Integer, String> huffMap;
+    private LinkedList<TreeNode> nodes;
 
     /**
      * pre: none
@@ -49,7 +50,7 @@ public class HuffmanTree {
      */
     public HuffmanTree(int[] freq) {
         PriorityQueue314<TreeNode> queue = new PriorityQueue314<>();
-        LinkedList<TreeNode> nodes = new LinkedList<>();
+        nodes = new LinkedList<>();
         huffMap = new HashMap<>();
         for (int i = 0; i < freq.length; i++) {
             if (freq[i] != 0) {
@@ -60,7 +61,8 @@ public class HuffmanTree {
         while (queue.size() > 1) {
             TreeNode left = queue.poll();
             TreeNode right = queue.poll();
-            queue.add(new TreeNode(left, -1, right));
+            nodes.add(new TreeNode(left, -1, right));
+            queue.add(nodes.getLast());
         }
         root = queue.poll();
         fillMap(nodes);
@@ -130,10 +132,18 @@ public class HuffmanTree {
 
     /**
      * getter for map
-     * @return the map
+     * @return the HashMap of characters and their paths in the tree
      */
     public HashMap<Integer, String> getMap() {
         return huffMap;
+    }
+
+    /**
+     * getter for nodes
+     * @return a LinkedList containing all the nodes in the tree
+     */
+    public LinkedList<TreeNode> getNodes() {
+        return nodes;
     }
 
     /**
@@ -161,30 +171,16 @@ public class HuffmanTree {
     }
 
     /**
-     * pre: none
-     * post: should get a linkedlist of all the nodes in tree
-     * goes through huffman tree and adds each node into list
-     */
-    private void inOrder(TreeNode node, LinkedList<TreeNode> list) {
-        if (node.getLeft() != null) {
-            inOrder(node.getLeft(), list);
-        }
-        if (node.isLeaf()) {
-            list.add(node);
-        }
-        if (node.getRight() != null) {
-            inOrder(node.getRight(), list);
-        }
-    }
-
-    /**
+     * @param nodes has all nodes
      * pre: none
      * post: should create a map with all the node values with huffman codes
      * goes through list of nodes to find the huffman codes for each node in tree
      */
     private void fillMap(LinkedList<TreeNode> nodes) {
         for (TreeNode node : nodes) {
-            huffMap.put(node.getValue(), get(root, "", node.getValue()));
+            if (node.isLeaf()) {
+                huffMap.put(node.getValue(), get(root, "", node.getValue()));
+            }
         }
     }
 

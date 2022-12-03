@@ -46,14 +46,6 @@ public class PriorityQueue314<E extends Comparable<E>> {
     }
 
     /**
-     * Returns top of queue
-     * @return first value in con
-     */
-    public E peek() {
-        return con.getFirst();
-    }
-
-    /**
      * Removes and returns top of queue
      * @return first value in con
      */

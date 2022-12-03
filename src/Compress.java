@@ -16,7 +16,7 @@
  *
  */
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Class that deals with anything relevant to compressing a file, including preprocess
@@ -117,15 +117,14 @@ public class Compress {
      * @return internal nodes
      */
     private int countInternalNodes() {
-        ArrayList<TreeNode> nodes = new ArrayList<>();
-        tree.preOrder(tree.getTree(), nodes);
+        LinkedList<TreeNode> nodes = tree.getNodes();
         int count = 0;
         for (TreeNode node : nodes) {
             if (node.isLeaf()) {
                 count++;
             }
         }
-        return nodes.size() - count;
+        return tree.getNodes().size() - count;
     }
 
     /**
