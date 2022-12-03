@@ -50,8 +50,7 @@ public class SimpleHuffProcessor implements IHuffProcessor {
             comp = new Compress(new BitInputStream(in), headerFormat, myViewer);
             return comp.bitsSaved();
         }
-        throw new IllegalArgumentException("viewer is null");
-
+        return -1;
     }
 
     /**
@@ -70,21 +69,17 @@ public class SimpleHuffProcessor implements IHuffProcessor {
      * writing to the output file.
      */
     public int compress(InputStream in, OutputStream out, boolean force) throws IOException {
-        // reading in 8 bits at a time with the generated huffman codes (in the map),
-        // but this is after we put in header format, magic number, header, and at the end we
-        // include peof (but that's already stored in the map)
         if (comp.getFormat() != STORE_COUNTS && comp.getFormat() != STORE_TREE) {
             myViewer.showError("format is neither store counts or storetree");
         }
         if (!force && comp.bitsSaved() < 0) {
-            myViewer.showMessage("you don't save any bits, so no need to have file");
+            showString("you don't save any bits, so no need to have file");
             return 0;
         }
         if (myViewer != null) {
             return comp.huff(new BitInputStream(in), new BitOutputStream(out), myViewer);
         }
-        throw new IllegalArgumentException("viewer is null");
-        //return 0;
+        return -1;
     }
 
     /**
@@ -105,11 +100,18 @@ public class SimpleHuffProcessor implements IHuffProcessor {
                 "File did not start with the huff magic number.");
             return -1;
         }
-        if (myViewer != null) {
-            Uncompress uncomp = new Uncompress(inputStream);
-            return uncomp.unhuff(inputStream, outputStream);
+        int format = inputStream.readBits(IHuffConstants.BITS_PER_INT);
+        if (format != IHuffConstants.STORE_COUNTS && format != IHuffConstants.STORE_TREE) {
+            myViewer.showError("format is not right");
+            return -1;
         }
-        throw new IllegalArgumentException("myviewer is null");
+        if (myViewer != null) {
+            Uncompress uncomp = new Uncompress(inputStream, format, myViewer);
+            final int bitsUncompressed = uncomp.unhuff(inputStream, outputStream, myViewer);
+            showString("done with uncompressing, uncompressed bits are:" + bitsUncompressed);
+            return bitsUncompressed;
+        }
+        return -1;
     }
 
     /**
@@ -120,6 +122,12 @@ public class SimpleHuffProcessor implements IHuffProcessor {
         myViewer = viewer;
     }
 
+
+    /**
+     * pre: none
+     * shows a message on viewer
+     * @param s is what needs to be shown
+     */
     private void showString(String s) {
         if (myViewer != null) {
             myViewer.update(s);

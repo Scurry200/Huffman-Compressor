@@ -1,3 +1,20 @@
+/*  Student information for assignment:
+ *
+ *  On Our honor, Sherwin Amal and Ayaan Nazir, this programming assignment is Our own work
+ *  and We have not provided this code to any other student.
+ *
+ *  Number of slip days used: 2
+ *
+ *  Student 1 (Student whose Canvas account is being used)
+ *  UTEID: sa53879
+ *  email address: sherwinamal@utexas.edu
+ *  Grader name: Skyler
+ *
+ *  Student 2
+ *  UTEID: an29256
+ *  email address: nazir@utexas.edu
+ *
+ */
 import java.util.LinkedList;
 
 public class PriorityQueue314<E extends Comparable<E>> {

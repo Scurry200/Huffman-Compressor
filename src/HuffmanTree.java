@@ -1,5 +1,21 @@
+/*  Student information for assignment:
+ *
+ *  On Our honor, Sherwin Amal and Ayaan Nazir, this programming assignment is Our own work
+ *  and We have not provided this code to any other student.
+ *
+ *  Number of slip days used: 2
+ *
+ *  Student 1 (Student whose Canvas account is being used)
+ *  UTEID: sa53879
+ *  email address: sherwinamal@utexas.edu
+ *  Grader name: Skyler
+ *
+ *  Student 2
+ *  UTEID: an29256
+ *  email address: nazir@utexas.edu
+ *
+ */
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 /**
@@ -14,20 +30,19 @@ public class HuffmanTree {
      * pre: none
      * post: should create a tree based in the inputstream of characters
      * constructors to build tree for store tree format
+     * @param inputStream is input of bits
+     * @param viewer is GUI
      * @throws IOException if an error occurs while reading from the input file.
      */
-    public HuffmanTree(BitInputStream inputStream) throws IOException {
-        this.root = buildTree(inputStream);
-        LinkedList<TreeNode> nodes = new LinkedList<>();
-        huffMap = new HashMap<>();
-        inOrder(root, nodes);
-        fillMap(nodes);
+    public HuffmanTree(BitInputStream inputStream, IHuffViewer viewer) throws IOException {
+        this.root = buildTree(inputStream, viewer);
     }
 
 
     /**
      * pre: none
      * post: should create a tree based on the ascii frequency arrays
+     * @param freq is frequency array of ascii
      * constructors to build tree for store count format
      * goes through array to create nodes, and will eventually create a priority queue,
      * that ends up creating a huffman tree, also creates huffman tree map
@@ -53,6 +68,7 @@ public class HuffmanTree {
 
     /**
      * pre: none
+     * @param temp is node tree just traversed through
      * post: should calculate the number of bits that is in the huffman tree
      * method meant for calculating the number of bits that will be in the compressed file
      * whenever format is supposed to be store tree
@@ -68,28 +84,15 @@ public class HuffmanTree {
     }
 
     /**
-     * pre: none
-     * post: should have a list of all the nodes in the huffman tree
-     * recursively goes through the tree and adds all the nodes in the huffman tree
-     */
-    public void preOrder(TreeNode node, ArrayList<TreeNode> list) {
-        list.add(node);
-        if (node.getLeft() != null) {
-            preOrder(node.getLeft(), list);
-        }
-        if (node.getRight() != null) {
-            preOrder(node.getRight(), list);
-        }
-    }
-
-    /**
      * Uses tree to write the uncompressed file
      * @param inputStream used for reading bits
      * @param outputStream used for writing bits
+     * @param view is GUI
      * @return bits written
      * @throws IOException if an error occurs while reading/writing from the input/output file.
      */
-    public int writeTree(BitInputStream inputStream, BitOutputStream outputStream)
+    public int writeTree(BitInputStream inputStream, BitOutputStream outputStream,
+                         IHuffViewer view)
         throws IOException {
         TreeNode node = getTree();
         boolean done = false;
@@ -97,6 +100,7 @@ public class HuffmanTree {
         while (!done) {
             int bit = inputStream.readBits(1);
             if (bit == -1) {
+                view.showError("NO PSEUDO VALUE FOUND, REACHED END OF FILE");
                 throw new IOException("Error reading compressed file. \n" +
                     "unexpected end of input. No PSEUDO_EOF value.");
             } else {
@@ -112,6 +116,7 @@ public class HuffmanTree {
                 }
             }
         }
+        showString("done with writing tree", view);
         return count;
     }
 
@@ -132,23 +137,26 @@ public class HuffmanTree {
     }
 
     /**
+     * @param viewer is GUI
+     * @param inputStream is current bits to read
      * pre: none
      * post: should create a tree based on inputstream codes
      * builds a tree based on the input stream of huffman codes
      * @return huffman tree from inputstream of codes
      * @throws IOException if an error occurs while reading from the input file.
      */
-    private TreeNode buildTree(BitInputStream inputStream) throws IOException {
+    private TreeNode buildTree(BitInputStream inputStream, IHuffViewer viewer) throws IOException {
         int bit = inputStream.readBits(1);
         if (bit == 0) {
-            //nodeInternal.setLeft(buildTree(inputStream));
-            //nodeInternal.setRight(buildTree(inputStream));
-            return new TreeNode(buildTree(inputStream), -1, buildTree(inputStream));
+            return new TreeNode(buildTree(inputStream, viewer), -1,
+                buildTree(inputStream, viewer));
         } else if (bit == 1) {
             int leafVal = inputStream.readBits(1 + IHuffConstants.BITS_PER_WORD);
             return new TreeNode(leafVal, -1);
         } else {
-            throw new IllegalArgumentException("error with reading");
+            viewer.showError("issue with reading");
+            //only used whenever tree cannot be built
+            throw new IllegalArgumentException("view gui, file cannot be read");
         }
     }
 
@@ -199,5 +207,17 @@ public class HuffmanTree {
             return temp;
         }
         return get(node.getRight(), val + "1", bit);
+    }
+
+    /**
+     * pre: none
+     * shows a message on viewer
+     * @param s is what needs to be shown
+     * @param myViewer is viewer gui
+     */
+    private void showString(String s, IHuffViewer myViewer) {
+        if (myViewer != null) {
+            myViewer.update(s);
+        }
     }
 }

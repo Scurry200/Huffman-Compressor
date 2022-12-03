@@ -1,3 +1,20 @@
+/*  Student information for assignment:
+ *
+ *  On Our honor, Sherwin Amal and Ayaan Nazir, this programming assignment is Our own work
+ *  and We have not provided this code to any other student.
+ *
+ *  Number of slip days used: 2
+ *
+ *  Student 1 (Student whose Canvas account is being used)
+ *  UTEID: sa53879
+ *  email address: sherwinamal@utexas.edu
+ *  Grader name: Skyler
+ *
+ *  Student 2
+ *  UTEID: an29256
+ *  email address: nazir@utexas.edu
+ *
+ */
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -29,13 +46,13 @@ public class Compress {
             ascii[read]++;
             read = inputStream.read();
         }
-        view.showMessage("finished with frequency array");
+        showString("finished with frequency array", view);
         ascii[IHuffConstants.ALPH_SIZE] = 1;
         tree = new HuffmanTree(ascii);
-        view.showMessage("created huffman tree");
-        view.showMessage("saved bits are:" + bitsSaved());
+        showString("created huffman tree", view);
         findingOriginalBits();
         findingCompressedBits(tree.getTree(), header);
+        showString("saved bits are:" + bitsSaved(), view);
     }
 
     /**
@@ -63,17 +80,18 @@ public class Compress {
             for(int i = 0; i < IHuffConstants.ALPH_SIZE; i++) {
                 outputStream.writeBits(IHuffConstants.BITS_PER_INT, ascii[i]);
             }
-            view.showMessage("done with store count header writing");
+            showString("done with store count header writing", view);
         } else if (format == IHuffConstants.STORE_TREE) {
             int sizeInternal = countInternalNodes();
             int count = tree.getMap().size();
             outputStream.writeBits(IHuffConstants.BITS_PER_INT, (sizeInternal +
                 (count * (IHuffConstants.BITS_PER_WORD + 2))));
             preOrderHelp(outputStream, tree.getTree());
-            view.showMessage("done with store tree header writing");
+            showString("done with store tree header writing", view);
         }
         compressData(inputStream, outputStream);
-        view.showMessage("done with compressing");
+        showString("done with compressing", view);
+        showString("compressedBits:" + compressedBits, view);
         outputStream.close();
         return compressedBits;
     }
@@ -84,7 +102,8 @@ public class Compress {
      * @param outputStream writes bits to file
      * @throws IOException if an error occurs while reading/writing from the input/output file.
      */
-    private void compressData(BitInputStream inputStream, BitOutputStream outputStream) throws IOException {
+    private void compressData(BitInputStream inputStream, BitOutputStream outputStream)
+        throws IOException {
         int read = inputStream.read();
         while (read != -1) {
             sequenceConverting(tree.getMap().get(read), outputStream);
@@ -186,4 +205,15 @@ public class Compress {
         }
     }
 
+    /**
+     * pre: none
+     * shows a message on viewer
+     * @param s is what needs to be shown
+     * @param myViewer is viewer gui
+     */
+    private void showString(String s, IHuffViewer myViewer) {
+        if (myViewer != null) {
+            myViewer.update(s);
+        }
+    }
 }
